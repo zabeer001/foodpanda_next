@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-function Dashboard() {
+// A separate component to handle useSearchParams
+function DashboardContent() {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState('');
   const router = useRouter();
@@ -23,7 +24,7 @@ function Dashboard() {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/me`, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           credentials: 'omit',
@@ -44,7 +45,7 @@ function Dashboard() {
             const retryResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/me`, {
               method: 'GET',
               headers: {
-                'Authorization': `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
               },
               credentials: 'omit',
@@ -74,37 +75,36 @@ function Dashboard() {
     fetchUser();
   }, [searchParams, router]);
 
- const handleLogout = async () => {
-  let token = searchParams.get('token') || localStorage.getItem('token');
+  const handleLogout = async () => {
+    let token = searchParams.get('token') || localStorage.getItem('token');
 
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/logout`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/logout`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    console.log('Logout response:', data);
+      console.log('Logout response:', data);
 
-    if (data.success) {
-      // Handle successful logout
+      if (data.success) {
+        localStorage.removeItem('token');
+        router.push('/login');
+        setMessage(data.message); // "Successfully logged out"
+      } else {
+        setMessage(data.message || 'Logout failed');
+      }
+    } catch (error) {
+      setMessage('An error occurred during logout: ' + error.message);
       localStorage.removeItem('token');
       router.push('/login');
-      setMessage(data.message); // "Successfully logged out"
-    } else {
-      // Handle unsuccessful logout
-      setMessage(data.message || 'Logout failed');
     }
-  } catch (error) {
-    setMessage('An error occurred during logout: ' + error.message);
-    localStorage.removeItem('token');
-    router.push('/login');
-  }
-};
+  };
+
   if (!user) {
     return <p>{message || 'Loading...'}</p>;
   }
@@ -120,4 +120,11 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+// Main Dashboard component with Suspense boundary
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<p>Loading dashboard...</p>}>
+      <DashboardContent />
+    </Suspense>
+  );
+}

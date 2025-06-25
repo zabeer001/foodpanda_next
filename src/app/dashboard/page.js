@@ -60,7 +60,7 @@ function Dashboard() {
 
   return (
     <div className="Dashboard">
-      <h1>foodpanda</h1>
+      <h1>Foodpanda</h1>
       <h2>Welcome, {user.name}</h2>
       <p>Email: {user.email}</p>
       <p>Role: {user.role}</p>

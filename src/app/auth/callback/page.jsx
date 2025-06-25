@@ -35,6 +35,7 @@ function AuthCallback() {
 
                     // Redirect to dashboard with token
                     const redirectUrl = `https://ecommerce-next-zabeer-steadfast.vercel.app/dashboard?token=${encodeURIComponent(token)}`;
+                  
                     window.location.href = redirectUrl;
                 } else {
                     setMessage(data.message || 'Authentication failed');

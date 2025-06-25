@@ -49,12 +49,13 @@ function Login() {
   const handleFoodpandaLogin = () => {
     const redirectUrl = encodeURIComponent('https://ecommerce-next-zabeer-steadfast.vercel.app/auth/callback');
     window.location.href = `https://ecommerce-next-zabeer-steadfast.vercel.app/auth/callback?redirect=${redirectUrl}`;
+  
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
       <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6">Login to Ecommerce</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Login to foodpanda</h2>
 
         {message && <p className="text-center text-sm text-red-600 mb-4">{message}</p>}
 

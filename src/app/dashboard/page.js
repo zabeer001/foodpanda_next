@@ -1,18 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem('token');
+      let token = searchParams.get('token') || localStorage.getItem('token');
+
       if (!token) {
-        setMessage('No token found, please login.');
+        setMessage('No token found. Please log in.');
         router.push('/login');
         return;
       }
@@ -24,36 +26,85 @@ function Dashboard() {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          credentials: 'omit', // Explicitly set to not include credentials (support_credentials: false)
+          credentials: 'omit',
         });
-
-        if (response.status === 401) {
-          localStorage.removeItem('token');
-          router.push('/login');
-          return;
-        }
 
         const data = await response.json();
 
         if (response.ok && data.success) {
           setUser(data.data);
           setMessage(data.message);
+          if (searchParams.get('token')) {
+            localStorage.setItem('token', token);
+          }
         } else {
           setMessage(data.message || 'Failed to fetch user details.');
+          if (searchParams.get('token') && localStorage.getItem('token')) {
+            token = localStorage.getItem('token');
+            const retryResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/me`, {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              credentials: 'omit',
+            });
+
+            const retryData = await retryResponse.json();
+            if (retryResponse.ok && retryData.success) {
+              setUser(retryData.data);
+              setMessage(retryData.message);
+            } else {
+              setMessage(retryData.message || 'Failed to fetch user details with local storage token.');
+              localStorage.removeItem('token');
+              router.push('/login');
+            }
+          } else {
+            localStorage.removeItem('token');
+            router.push('/login');
+          }
         }
       } catch (error) {
         setMessage('An error occurred: ' + error.message);
+        localStorage.removeItem('token');
+        router.push('/login');
       }
     };
 
     fetchUser();
-  }, []);
+  }, [searchParams, router]);
 
-  const handleLogout = () => {
+ const handleLogout = async () => {
+  let token = searchParams.get('token') || localStorage.getItem('token');
+
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/logout`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    console.log('Logout response:', data);
+
+    if (data.success) {
+      // Handle successful logout
+      localStorage.removeItem('token');
+      router.push('/login');
+      setMessage(data.message); // "Successfully logged out"
+    } else {
+      // Handle unsuccessful logout
+      setMessage(data.message || 'Logout failed');
+    }
+  } catch (error) {
+    setMessage('An error occurred during logout: ' + error.message);
     localStorage.removeItem('token');
     router.push('/login');
-  };
-
+  }
+};
   if (!user) {
     return <p>{message || 'Loading...'}</p>;
   }

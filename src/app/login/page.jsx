@@ -47,8 +47,8 @@ function Login() {
   };
 
   const handleFoodpandaLogin = () => {
-    const redirectUrl = encodeURIComponent('https://foodpanda-next.vercel.app/auth/callback');
-    window.location.href = `https://foodpanda-next.vercel.app/`;
+    const redirectUrl = encodeURIComponent('https://ecommerce-next-zabeer-steadfast-vercel.app/auth/callback');
+    window.location.href = `https://ecommerce-next-zabeer-steadfast-vercel.app/auth/callback?redirect=${redirectUrl}`;
   };
 
   return (

@@ -47,8 +47,8 @@ function Login() {
   };
 
   const handleFoodpandaLogin = () => {
-    const redirectUrl = encodeURIComponent('https://your-frontend-url.com/auth/callback');
-    window.location.href = `https://foodpanda-qx0rn5r40-zabeer001s-projects.vercel.app/auth/callback?redirect_url=${redirectUrl}`;
+    const redirectUrl = encodeURIComponent('https://foodpanda-next.vercel.app/auth/callback');
+    window.location.href = `https://foodpanda-next.vercel.app/`;
   };
 
   return (

@@ -8,7 +8,7 @@ function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 flex items-center justify-center px-4">
       <div className="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md w-full">
-        <h1 className="text-3xl font-extrabold text-gray-800 mb-6">🚀 The Ecommerce App</h1>
+        <h1 className="text-3xl font-extrabold text-gray-800 mb-6">Foodpanda App</h1>
         <p className="text-gray-600 mb-8">Your one-stop shop for everything cool. Log in to explore products, deals, and more!</p>
         <button
           onClick={() => router.push('/login')}

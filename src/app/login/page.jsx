@@ -91,7 +91,7 @@ function Login() {
             onClick={handleFoodpandaLogin}
             className="bg-pink-500 hover:bg-pink-600 text-white font-medium px-4 py-2 rounded-lg"
           >
-            Login with Foodpanda
+            Login with ecommerce
           </button>
         </div>
       </div>
